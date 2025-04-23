@@ -1,5 +1,15 @@
 import React from 'react';
-import { IonPage, IonHeader, IonToolbar, IonTitle, IonContent, IonGrid, IonRow, IonCol, IonCard } from '@ionic/react';
+import { 
+  IonPage, 
+  IonHeader, 
+  IonToolbar, 
+  IonTitle, 
+  IonContent,
+  IonGrid,
+  IonRow,
+  IonCol,
+  IonCard
+} from '@ionic/react';
 import StepCounter from '../components/Fitness/StepCounter';
 import WaterTracker from '../components/Fitness/WaterTracker';
 import SleepTracker from '../components/Fitness/SleepTracker';
@@ -9,7 +19,7 @@ const Home: React.FC = () => {
     <IonPage>
       <IonHeader>
         <IonToolbar>
-          <IonTitle>Dashboard</IonTitle>
+          <IonTitle>Home</IonTitle>
         </IonToolbar>
       </IonHeader>
       <IonContent>
@@ -39,4 +49,4 @@ const Home: React.FC = () => {
   );
 };
 
-export default Home;
+export default Home; // ← Default export

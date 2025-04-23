@@ -1,8 +1,24 @@
 import React from 'react';
-import { IonApp, IonRouterOutlet, IonTabs, IonTabBar, IonTabButton, IonIcon, IonLabel } from '@ionic/react';
+import { 
+  IonApp, 
+  IonRouterOutlet, 
+  IonTabs, 
+  IonTabBar, 
+  IonTabButton, 
+  IonIcon, 
+  IonLabel 
+} from '@ionic/react';
 import { IonReactRouter } from '@ionic/react-router';
 import { Route, Redirect } from 'react-router-dom';
-import { home, statsChart, water, moon, person, settings } from 'ionicons/icons';
+import { 
+  home, 
+  statsChart, 
+  water, 
+  moon, 
+  person, 
+  settings,
+  fitness 
+} from 'ionicons/icons';
 import { AuthProvider } from './contexts/AuthContext';
 import { FitnessProvider } from './contexts/FitnessContext';
 import Home from './pages/Home';
@@ -30,7 +46,7 @@ const App: React.FC = () => (
               <Redirect exact from="/" to="/home" />
             </IonRouterOutlet>
 
-            <IonTabBar slot="bottom">
+            <IonTabBar slot="bottom" className="custom-tab-bar">
               <IonTabButton tab="home" href="/home">
                 <IonIcon icon={home} />
                 <IonLabel>Home</IonLabel>
@@ -39,15 +55,15 @@ const App: React.FC = () => (
                 <IonIcon icon={water} />
                 <IonLabel>Water</IonLabel>
               </IonTabButton>
-              <IonTabButton tab="sleep" href="/sleep">
-                <IonIcon icon={moon} />
-                <IonLabel>Sleep</IonLabel>
+              <IonTabButton tab="workout" href="/workout">
+                <IonIcon icon={fitness} />
+                <IonLabel>Workout</IonLabel>
               </IonTabButton>
               <IonTabButton tab="stats" href="/stats">
                 <IonIcon icon={statsChart} />
                 <IonLabel>Stats</IonLabel>
               </IonTabButton>
-              <IonTabButton tab="auth" href="/auth">
+              <IonTabButton tab="profile" href="/auth">
                 <IonIcon icon={person} />
                 <IonLabel>Profile</IonLabel>
               </IonTabButton>
