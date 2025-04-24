@@ -1,10 +1,10 @@
 import React from 'react';
-import { IonCard } from '@ionic/react';
+import { IonCard, IonCardHeader, IonCardTitle } from '@ionic/react';
 import { Bar } from 'react-chartjs-2';
-import { 
-  Chart as ChartJS, 
-  CategoryScale, 
-  LinearScale, 
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
   BarElement,
   Title,
   Tooltip,
@@ -13,14 +13,7 @@ import {
 import { FitnessContext } from '../../contexts/FitnessContext';
 
 // Register ChartJS components
-ChartJS.register(
-  CategoryScale,
-  LinearScale,
-  BarElement,
-  Title,
-  Tooltip,
-  Legend
-);
+ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
 
 const FitnessChart: React.FC = () => {
   const { data } = React.useContext(FitnessContext);
@@ -61,6 +54,11 @@ const FitnessChart: React.FC = () => {
 
   return (
     <IonCard>
+      <IonCardHeader>
+        <IonCardTitle style={{ padding: '10px' }}>
+          Weekly Fitness Overview
+        </IonCardTitle>
+      </IonCardHeader>
       <div style={{ padding: '20px' }}>
         <Bar data={chartData} options={options} />
       </div>

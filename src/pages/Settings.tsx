@@ -1,35 +1,35 @@
 import React, { useContext, useState } from 'react';
-import { 
-  IonPage, 
-  IonHeader, 
-  IonToolbar, 
-  IonTitle, 
+import {
+  IonPage,
+  IonHeader,
+  IonToolbar,
+  IonTitle,
   IonContent,
   IonList,
   IonItem,
   IonLabel,
   IonToggle,
+  IonRange,
   IonSelect,
   IonSelectOption,
-  IonRange,
-  IonButton
+  IonButton,
+  IonToast
 } from '@ionic/react';
-import { moon, notifications, body } from 'ionicons/icons';
-import { useHistory } from 'react-router-dom';
 import { AuthContext } from '../contexts/AuthContext';
 
 const Settings: React.FC = () => {
-  const { logout } = useContext(AuthContext);
-  const history = useHistory();
+  const { user, logout } = useContext(AuthContext);
+  const [showToast, setShowToast] = useState(false);
+
   const [darkMode, setDarkMode] = useState(false);
   const [notificationsEnabled, setNotificationsEnabled] = useState(true);
   const [stepGoal, setStepGoal] = useState(10000);
   const [waterGoal, setWaterGoal] = useState(2000);
-  const [unitSystem, setUnitSystem] = useState<'metric'|'imperial'>('metric');
+  const [unitSystem, setUnitSystem] = useState<'metric' | 'imperial'>('metric');
 
   const handleLogout = () => {
     logout();
-    history.push('/auth');
+    setShowToast(true);
   };
 
   return (
@@ -39,76 +39,79 @@ const Settings: React.FC = () => {
           <IonTitle>Settings</IonTitle>
         </IonToolbar>
       </IonHeader>
+
       <IonContent>
         <IonList>
-          {/* Appearance Settings */}
+
+          {/* 👤 Show user info */}
           <IonItem>
-            <IonIcon icon={moon} slot="start" />
+            <IonLabel>
+              <strong>User:</strong> {user?.name || 'Anonymous'}
+              <br />
+              <strong>Email:</strong> {user?.email || 'Not available'}
+            </IonLabel>
+          </IonItem>
+
+          {/* Appearance */}
+          <IonItem>
             <IonLabel>Dark Mode</IonLabel>
-            <IonToggle 
-              checked={darkMode} 
-              onIonChange={e => setDarkMode(e.detail.checked)} 
-            />
+            <IonToggle checked={darkMode} onIonChange={(e) => setDarkMode(e.detail.checked)} />
           </IonItem>
 
-          {/* Notification Settings */}
+          {/* Notifications */}
           <IonItem>
-            <IonIcon icon={notifications} slot="start" />
             <IonLabel>Enable Notifications</IonLabel>
-            <IonToggle 
-              checked={notificationsEnabled} 
-              onIonChange={e => setNotificationsEnabled(e.detail.checked)}
-            />
+            <IonToggle checked={notificationsEnabled} onIonChange={(e) => setNotificationsEnabled(e.detail.checked)} />
           </IonItem>
 
-          {/* Fitness Goals */}
+          {/* Goals */}
           <IonItem>
-            <IonIcon icon={body} slot="start" />
             <IonLabel>Daily Step Goal: {stepGoal}</IonLabel>
-            <IonRange 
-              min={2000} 
-              max={20000} 
+            <IonRange
+              min={2000}
+              max={20000}
               step={500}
               value={stepGoal}
-              onIonChange={e => setStepGoal(e.detail.value as number)}
+              onIonChange={(e) => setStepGoal(e.detail.value as number)}
             />
           </IonItem>
 
           <IonItem>
-            <IonLabel>Water Intake Goal (ml): {waterGoal}</IonLabel>
-            <IonRange 
-              min={500} 
-              max={4000} 
+            <IonLabel>Water Goal (ml): {waterGoal}</IonLabel>
+            <IonRange
+              min={500}
+              max={4000}
               step={250}
               value={waterGoal}
-              onIonChange={e => setWaterGoal(e.detail.value as number)}
+              onIonChange={(e) => setWaterGoal(e.detail.value as number)}
             />
           </IonItem>
 
-          {/* Units System */}
+          {/* Units */}
           <IonItem>
             <IonLabel>Measurement Units</IonLabel>
-            <IonSelect 
-              value={unitSystem}
-              placeholder="Select Unit System"
-              onIonChange={e => setUnitSystem(e.detail.value)}
-            >
+            <IonSelect value={unitSystem} onIonChange={(e) => setUnitSystem(e.detail.value)}>
               <IonSelectOption value="metric">Metric (km, ml)</IonSelectOption>
-              <IonSelectOption value="imperial">Imperial (miles, oz)</IonSelectOption>
+              <IonSelectOption value="imperial">Imperial (mi, oz)</IonSelectOption>
             </IonSelect>
           </IonItem>
         </IonList>
 
-        {/* Logout Button */}
+        {/* 🔴 Logout Button */}
         <div style={{ padding: '20px' }}>
-          <IonButton 
-            expand="block" 
-            color="danger"
-            onClick={handleLogout}
-          >
+          <IonButton expand="block" color="danger" onClick={handleLogout}>
             Log Out
           </IonButton>
         </div>
+
+        {/* ✅ Logout Toast */}
+        <IonToast
+          isOpen={showToast}
+          message="You have been logged out."
+          duration={1500}
+          color="warning"
+          position="bottom"
+        />
       </IonContent>
     </IonPage>
   );

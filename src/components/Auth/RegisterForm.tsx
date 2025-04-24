@@ -1,28 +1,43 @@
 import React, { useState, useContext } from 'react';
-import { 
-  IonItem, 
-  IonLabel, 
-  IonInput, 
-  IonButton, 
-  IonAlert 
+import {
+  IonItem,
+  IonLabel,
+  IonInput,
+  IonButton,
+  IonAlert,
+  IonToast
 } from '@ionic/react';
 import { AuthContext } from '../../contexts/AuthContext';
+import { useHistory } from 'react-router-dom';
 
 const RegisterForm: React.FC = () => {
+  const { register } = useContext(AuthContext);
+  const history = useHistory();
+
   const [email, setEmail] = useState('');
   const [name, setName] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [showAlert, setShowAlert] = useState(false);
-  const { register } = useContext(AuthContext);
+  const [showToast, setShowToast] = useState(false);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (email && name && password && password === confirmPassword) {
-      register(email, name, password);
-    } else {
+
+    // ❌ Validation: all fields must be filled and passwords match
+    if (!email || !name || !password || password !== confirmPassword) {
       setShowAlert(true);
+      return;
     }
+
+    // ✅ Register user (stored in users[] but not logged in)
+    register(email, name, password);
+    setShowToast(true);
+
+    // ⏳ After toast, go back to login screen
+    setTimeout(() => {
+      history.push('/auth');
+    }, 1500);
   };
 
   return (
@@ -36,6 +51,7 @@ const RegisterForm: React.FC = () => {
             required
           />
         </IonItem>
+
         <IonItem>
           <IonLabel position="floating">Email</IonLabel>
           <IonInput
@@ -45,6 +61,7 @@ const RegisterForm: React.FC = () => {
             required
           />
         </IonItem>
+
         <IonItem>
           <IonLabel position="floating">Password</IonLabel>
           <IonInput
@@ -54,6 +71,7 @@ const RegisterForm: React.FC = () => {
             required
           />
         </IonItem>
+
         <IonItem>
           <IonLabel position="floating">Confirm Password</IonLabel>
           <IonInput
@@ -63,19 +81,32 @@ const RegisterForm: React.FC = () => {
             required
           />
         </IonItem>
+
         <IonButton expand="block" type="submit" className="ion-margin-top">
           Register
         </IonButton>
       </form>
 
+      {/* ❌ Field error */}
       <IonAlert
         isOpen={showAlert}
         onDidDismiss={() => setShowAlert(false)}
-        header="Error"
-        message={password !== confirmPassword 
-          ? "Passwords don't match" 
-          : "Please fill all fields"}
+        header="Registration Error"
+        message={
+          password !== confirmPassword
+            ? "Passwords don't match"
+            : "Please fill out all fields"
+        }
         buttons={['OK']}
+      />
+
+      {/* ✅ Success toast */}
+      <IonToast
+        isOpen={showToast}
+        message="Registration successful! Please log in."
+        duration={1500}
+        position="bottom"
+        color="success"
       />
     </>
   );

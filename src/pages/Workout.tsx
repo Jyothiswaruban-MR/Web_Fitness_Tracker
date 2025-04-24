@@ -1,5 +1,11 @@
 import React from 'react';
-import { IonPage, IonHeader, IonToolbar, IonTitle, IonContent } from '@ionic/react';
+import {
+  IonPage,
+  IonHeader,
+  IonToolbar,
+  IonTitle,
+  IonContent
+} from '@ionic/react';
 import WorkoutLog from '../components/Fitness/WorkoutLog';
 
 const Workout: React.FC = () => {
@@ -10,7 +16,8 @@ const Workout: React.FC = () => {
           <IonTitle>Workout Log</IonTitle>
         </IonToolbar>
       </IonHeader>
-      <IonContent fullscreen>
+
+      <IonContent className="ion-padding" fullscreen>
         <WorkoutLog />
       </IonContent>
     </IonPage>
