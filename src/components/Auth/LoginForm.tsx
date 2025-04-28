@@ -1,4 +1,4 @@
-import React, { useState, useContext } from 'react';
+import React, { useState, useContext, useRef } from 'react';
 import {
   IonItem,
   IonLabel,
@@ -7,29 +7,45 @@ import {
   IonAlert,
   IonToast
 } from '@ionic/react';
-import { AuthContext } from '../../contexts/AuthContext';  // Updated import path
+import { AuthContext } from '../../contexts/AuthContext';
 import { useHistory } from 'react-router-dom';
 
 const LoginForm: React.FC = () => {
   const { login } = useContext(AuthContext);
   const history = useHistory();
+  const formRef = useRef<HTMLFormElement>(null);
 
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
   const [showAlert, setShowAlert] = useState(false);
   const [showToast, setShowToast] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (isSubmitting) return;
+    
+    setIsSubmitting(true);
+    
+    // Access current values directly from form inputs
+    const form = formRef.current;
+    if (!form) return;
+    
+    const formElements = form.elements as typeof form.elements & {
+      email: HTMLInputElement;
+      password: HTMLInputElement;
+    };
 
+    const email = formElements.email.value.trim();
+    const password = formElements.password.value.trim();
+
+    // Validate inputs
     if (!email || !password) {
       setErrorMsg("Please enter both email and password");
       setShowAlert(true);
+      setIsSubmitting(false);
       return;
     }
 
-    // Use login function from AuthContext
     try {
       login(email, password);
       setShowToast(true);
@@ -37,40 +53,44 @@ const LoginForm: React.FC = () => {
         history.push('/home');
       }, 1000);
     } catch (error) {
-      setErrorMsg("Login failed. Make sure you're registered.");
+      setErrorMsg("Login failed. Please check your credentials.");
       setShowAlert(true);
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
   return (
     <>
-      <form onSubmit={handleSubmit}>
+      <form ref={formRef} onSubmit={handleSubmit}>
         <IonItem>
           <IonLabel position="floating">Email</IonLabel>
-          <IonInput
-            type="email"
-            value={email}
-            onIonChange={(e) => setEmail(e.detail.value!)}
-            required
+          <IonInput 
+            name="email"
+            type="email" 
+            required 
           />
         </IonItem>
 
         <IonItem>
           <IonLabel position="floating">Password</IonLabel>
-          <IonInput
-            type="password"
-            value={password}
-            onIonChange={(e) => setPassword(e.detail.value!)}
-            required
+          <IonInput 
+            name="password"
+            type="password" 
+            required 
           />
         </IonItem>
 
-        <IonButton expand="block" type="submit" className="ion-margin-top">
-          Login
+        <IonButton 
+          expand="block" 
+          type="submit" 
+          className="ion-margin-top"
+          disabled={isSubmitting}
+        >
+          {isSubmitting ? 'Logging in...' : 'Login'}
         </IonButton>
       </form>
 
-      {/* Error Alert */}
       <IonAlert
         isOpen={showAlert}
         onDidDismiss={() => setShowAlert(false)}
@@ -79,7 +99,6 @@ const LoginForm: React.FC = () => {
         buttons={['OK']}
       />
 
-      {/* Success Toast */}
       <IonToast
         isOpen={showToast}
         message="Login successful!"

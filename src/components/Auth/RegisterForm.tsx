@@ -1,4 +1,4 @@
-import React, { useState, useContext, useEffect } from 'react';
+import React, { useState, useContext, useEffect, useRef } from 'react';
 import {
   IonItem,
   IonLabel,
@@ -13,155 +13,177 @@ import { useHistory } from 'react-router-dom';
 const RegisterForm: React.FC = () => {
   const { register } = useContext(AuthContext);
   const history = useHistory();
-  
-  // Form state
-  const [email, setEmail] = useState('');
-  const [name, setName] = useState('');
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
-  
-  // UI state
+  const formRef = useRef<HTMLFormElement>(null);
+
+  const [formData, setFormData] = useState({
+    email: '',
+    name: '',
+    password: '',
+    confirmPassword: ''
+  });
+
   const [showAlert, setShowAlert] = useState(false);
   const [showToast, setShowToast] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
   const [isRegistered, setIsRegistered] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Email validation
   const validateEmail = (email: string) => {
     const re = /\S+@\S+\.\S+/;
     return re.test(email);
   };
 
-  // Reset form
+  const handleInputChange = (field: keyof typeof formData) => 
+    (e: CustomEvent) => {
+      const value = e.detail.value || '';
+      setFormData(prev => ({
+        ...prev,
+        [field]: value
+      }));
+    };
+
   const resetForm = () => {
-    setEmail('');
-    setName('');
-    setPassword('');
-    setConfirmPassword('');
+    setFormData({
+      email: '',
+      name: '',
+      password: '',
+      confirmPassword: ''
+    });
   };
 
-  // Handle redirection after successful registration
   useEffect(() => {
-    let redirectTimer: NodeJS.Timeout;
-    
     if (isRegistered) {
-      redirectTimer = setTimeout(() => {
+      const timer = setTimeout(() => {
         history.push('/auth');
         resetForm();
       }, 1500);
+      return () => clearTimeout(timer);
     }
-    
-    return () => {
-      if (redirectTimer) clearTimeout(redirectTimer);
-    };
   }, [isRegistered, history]);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (isSubmitting) return;
     
-    // Comprehensive validation with clear error messages
-    if (!name.trim()) {
+    setIsSubmitting(true);
+    
+    // Use current values directly from form inputs
+    const form = formRef.current;
+    if (!form) return;
+    
+    const formElements = form.elements as typeof form.elements & {
+      name: HTMLInputElement;
+      email: HTMLInputElement;
+      password: HTMLInputElement;
+      confirmPassword: HTMLInputElement;
+    };
+
+    const name = formElements.name.value.trim();
+    const email = formElements.email.value.trim();
+    const password = formElements.password.value.trim();
+    const confirmPassword = formElements.confirmPassword.value.trim();
+
+    // Validate name
+    if (!name) {
       setErrorMsg("Please enter your name.");
       setShowAlert(true);
+      setIsSubmitting(false);
       return;
     }
-    
-    if (!email.trim()) {
-      setErrorMsg("Please enter your email address.");
-      setShowAlert(true);
-      return;
-    }
-    
-    if (!validateEmail(email)) {
+
+    // Validate email
+    if (!email || !validateEmail(email)) {
       setErrorMsg("Please enter a valid email address.");
       setShowAlert(true);
+      setIsSubmitting(false);
       return;
     }
-    
-    if (!password) {
-      setErrorMsg("Please enter a password.");
-      setShowAlert(true);
-      return;
-    }
-    
-    if (password.length < 6) {
+
+    // Validate password length
+    if (!password || password.length < 6) {
       setErrorMsg("Password must be at least 6 characters.");
       setShowAlert(true);
+      setIsSubmitting(false);
       return;
     }
-    
-    // Check if passwords match - this is the key validation you're having issues with
+
+    // Password mismatch check
     if (password !== confirmPassword) {
-      console.log("Password:", password, "Confirm:", confirmPassword);
       setErrorMsg("Passwords don't match.");
       setShowAlert(true);
+      setIsSubmitting(false);
       return;
     }
-    
+
     try {
-      // Register user (should return success/failure)
       const success = register(email, name, password);
-      
       if (success) {
-        console.log("Registration successful, showing toast");
         setShowToast(true);
         setIsRegistered(true);
-        // Redirection happens via useEffect
       } else {
         setErrorMsg("Registration failed. Email may already be in use.");
         setShowAlert(true);
       }
     } catch (error) {
-      console.error("Registration error:", error);
       setErrorMsg("Registration failed. Please try again.");
       setShowAlert(true);
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
   return (
     <>
-      <form onSubmit={handleSubmit}>
+      <form ref={formRef} onSubmit={handleSubmit}>
         <IonItem>
           <IonLabel position="floating">Name</IonLabel>
-          <IonInput
-            value={name}
-            onIonChange={(e) => setName(e.detail.value!)}
-            required
+          <IonInput 
+            name="name"
+            value={formData.name}
+            onIonChange={handleInputChange('name')} 
+            required 
           />
         </IonItem>
         <IonItem>
           <IonLabel position="floating">Email</IonLabel>
-          <IonInput
-            type="email"
-            value={email}
-            onIonChange={(e) => setEmail(e.detail.value!)}
-            required
+          <IonInput 
+            name="email"
+            type="email" 
+            value={formData.email}
+            onIonChange={handleInputChange('email')} 
+            required 
           />
         </IonItem>
         <IonItem>
           <IonLabel position="floating">Password</IonLabel>
-          <IonInput
-            type="password"
-            value={password}
-            onIonChange={(e) => setPassword(e.detail.value!)}
-            required
+          <IonInput 
+            name="password"
+            type="password" 
+            value={formData.password}
+            onIonChange={handleInputChange('password')}
+            required 
           />
         </IonItem>
         <IonItem>
           <IonLabel position="floating">Confirm Password</IonLabel>
-          <IonInput
-            type="password"
-            value={confirmPassword}
-            onIonChange={(e) => setConfirmPassword(e.detail.value!)}
-            required
+          <IonInput 
+            name="confirmPassword"
+            type="password" 
+            value={formData.confirmPassword}
+            onIonChange={handleInputChange('confirmPassword')}
+            required 
           />
         </IonItem>
-        <IonButton expand="block" type="submit" className="ion-margin-top">
-          Register
+        <IonButton 
+          expand="block" 
+          type="submit" 
+          className="ion-margin-top"
+          disabled={isSubmitting}
+        >
+          {isSubmitting ? 'Registering...' : 'Register'}
         </IonButton>
       </form>
-      
-      {/* Error Alert */}
+
       <IonAlert
         isOpen={showAlert}
         onDidDismiss={() => setShowAlert(false)}
@@ -170,7 +192,6 @@ const RegisterForm: React.FC = () => {
         buttons={['OK']}
       />
       
-      {/* Success Toast */}
       <IonToast
         isOpen={showToast}
         message="Registration successful! Redirecting to login page..."
