@@ -39,3 +39,25 @@
     margin-top: 30px;
     padding: 0 10px;
   }  
+
+  .meditation-timer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+  }
+  
+  .timer-text {
+    font-size: 24px;
+    margin-bottom: 10px;
+    font-weight: bold;
+  }
+  
+  .save-button {
+    margin-top: 10px;
+  }
+  
+  .saved-notes textarea {
+    margin-top: 10px;
+  }
+  

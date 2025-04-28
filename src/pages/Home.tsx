@@ -24,6 +24,8 @@ import {
   logOutOutline
 } from 'ionicons/icons';
 
+import Journal from '../components/Fitness/Journal';
+import MeditationTimer from '../components/Fitness/MeditationTimer';
 import StepCounter from '../components/Fitness/StepCounter';
 import WaterTracker from '../components/Fitness/WaterTracker';
 import SleepTracker from '../components/Fitness/SleepTracker';
@@ -113,6 +115,30 @@ const Home: React.FC = () => {
             </IonCol>
           </IonRow>
         </IonGrid>
+
+        <IonCard>
+  <IonCardHeader>
+    <IonCardTitle className="card-header-icon">
+      📝 Daily Journal
+    </IonCardTitle>
+  </IonCardHeader>
+  <IonCardContent>
+    <Journal />
+  </IonCardContent>
+</IonCard>
+
+
+<IonCard>
+  <IonCardHeader>
+    <IonCardTitle className="card-header-icon">
+      🧘‍♂️ Meditation Timer
+    </IonCardTitle>
+  </IonCardHeader>
+  <IonCardContent>
+    <MeditationTimer />
+  </IonCardContent>
+</IonCard>
+
 
         {/* Health Tip */}
         <IonCard>

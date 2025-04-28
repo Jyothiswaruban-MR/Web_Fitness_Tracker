@@ -7,7 +7,7 @@ import {
   IonAlert,
   IonToast
 } from '@ionic/react';
-import { AuthContext } from '../../contexts/AuthContext';
+import { AuthContext } from '../../contexts/AuthContext';  // Updated import path
 import { useHistory } from 'react-router-dom';
 
 const LoginForm: React.FC = () => {
